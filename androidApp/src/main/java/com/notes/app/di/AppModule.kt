@@ -14,6 +14,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
+import com.notes.app.ui.viewmodel.TodoViewModel
+
 val appModule = module {
     // Database
     single { DriverFactory(androidContext()) }
@@ -40,5 +42,6 @@ val appModule = module {
             repository = get()
         )
     }
+    viewModel { TodoViewModel(get()) }
     viewModel { SettingsViewModel(androidContext(), get()) }
 }

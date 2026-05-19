@@ -22,6 +22,9 @@ fun NotesNavGraph(
                 onNoteClick = { noteId ->
                     navController.navigate(Screen.NoteDetail.createRoute(noteId))
                 },
+                onTodoClick = {
+                    navController.navigate(Screen.Todos.route)
+                },
                 onSettingsClick = {
                     // TODO: Settings screen
                 },
@@ -46,6 +49,14 @@ fun NotesNavGraph(
             )
         }
 
+        composable(Screen.Todos.route) {
+            TodoScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Sync.route) {
             SyncScreen(
                 onNavigateBack = {
@@ -61,6 +72,7 @@ sealed class Screen(val route: String) {
     data object NoteDetail : Screen("note/{noteId}") {
         fun createRoute(noteId: String) = "note/$noteId"
     }
+    data object Todos : Screen("todos")
     data object Sync : Screen("sync")
     data object Settings : Screen("settings")
 }

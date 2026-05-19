@@ -23,6 +23,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun NoteListScreen(
     onNoteClick: (String) -> Unit,
+    onTodoClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onSyncClick: () -> Unit,
     viewModel: NoteListViewModel = koinViewModel()
@@ -50,30 +51,33 @@ fun NoteListScreen(
                         )
                     }
                 },
-                actions = {
-                    IconButton(onClick = { viewModel.onSearchQueryChange(if (searchQuery.isBlank()) " " else "") }) {
-                        Icon(
-                            imageVector = if (searchQuery.isBlank()) Icons.Default.Search else Icons.Default.Clear,
-                            contentDescription = "Search"
-                        )
-                    }
-                    if (pendingCount > 0) {
-                        BadgedBox(
-                            badge = { Badge { Text(pendingCount.toString()) } }
-                        ) {
-                            IconButton(onClick = onSyncClick) {
-                                Icon(Icons.Default.Sync, contentDescription = "Sync")
-                            }
-                        }
-                    } else {
+            actions = {
+                IconButton(onClick = { viewModel.onSearchQueryChange(if (searchQuery.isBlank()) " " else "") }) {
+                    Icon(
+                        imageVector = if (searchQuery.isBlank()) Icons.Default.Search else Icons.Default.Clear,
+                        contentDescription = "Search"
+                    )
+                }
+                IconButton(onClick = onTodoClick) {
+                    Icon(Icons.Default.CheckCircle, contentDescription = "Todos")
+                }
+                if (pendingCount > 0) {
+                    BadgedBox(
+                        badge = { Badge { Text(pendingCount.toString()) } }
+                    ) {
                         IconButton(onClick = onSyncClick) {
                             Icon(Icons.Default.Sync, contentDescription = "Sync")
                         }
                     }
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                } else {
+                    IconButton(onClick = onSyncClick) {
+                        Icon(Icons.Default.Sync, contentDescription = "Sync")
                     }
                 }
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
             )
         },
         floatingActionButton = {

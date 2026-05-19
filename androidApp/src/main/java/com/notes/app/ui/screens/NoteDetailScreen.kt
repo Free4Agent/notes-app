@@ -16,9 +16,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notes.app.ui.components.MarkdownPreview
 import com.notes.app.ui.viewmodel.NoteDetailViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,11 +27,12 @@ fun NoteDetailScreen(
     onNavigateBack: () -> Unit,
     onNoteDeleted: () -> Unit
 ) {
-    val viewModel: NoteDetailViewModel = koinViewModel { parametersOf(noteId) }
+    val viewModel: NoteDetailViewModel = koinViewModel { org.koin.core.parameter.parametersOf(noteId) }
     val note by viewModel.note.collectAsStateWithLifecycle()
     val hasChanges by viewModel.hasChanges.collectAsStateWithLifecycle()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var isPreviewMode by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -61,6 +62,14 @@ fun NoteDetailScreen(
                     }
                 },
                 actions = {
+                    // Preview toggle
+                    IconButton(onClick = { isPreviewMode = !isPreviewMode }) {
+                        Icon(
+                            imageVector = if (isPreviewMode) Icons.Default.Edit else Icons.Default.Visibility,
+                            contentDescription = if (isPreviewMode) "Edit" else "Preview"
+                        )
+                    }
+                    
                     if (hasChanges) {
                         TextButton(onClick = viewModel::saveNote) {
                             Text("SAVE")
@@ -74,92 +83,113 @@ fun NoteDetailScreen(
         }
     ) { padding ->
         note?.let { currentNote ->
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-            ) {
-                // Title field
-                BasicTextField(
-                    value = currentNote.title,
-                    onValueChange = viewModel::updateTitle,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    decorationBox = { innerTextField ->
-                        if (currentNote.title.isEmpty()) {
-                            Text(
-                                text = "Note title",
-                                style = TextStyle(fontSize = 24.sp),
-                                color = MaterialTheme.colorScheme.outline
-                            )
+            if (isPreviewMode) {
+                // Preview Mode
+                MarkdownPreview(
+                    markdown = buildString {
+                        if (currentNote.title.isNotBlank()) {
+                            appendLine("# ${currentNote.title}")
+                            appendLine()
                         }
-                        innerTextField()
-                    }
+                        if (currentNote.tags.isNotEmpty()) {
+                            appendLine(currentNote.tags.joinToString(" ") { "#$it" })
+                            appendLine()
+                        }
+                        append(currentNote.content)
+                    },
+                    modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize()
                 )
-
-                // Tags row
-                if (currentNote.tags.isNotEmpty()) {
-                    Row(
+            } else {
+                // Edit Mode
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize()
+                ) {
+                    // Title field
+                    BasicTextField(
+                        value = currentNote.title,
+                        onValueChange = viewModel::updateTitle,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        currentNote.tags.forEach { tag ->
-                            InputChip(
-                                selected = false,
-                                onClick = { },
-                                label = { Text(tag) },
-                                trailingIcon = {
-                                    Icon(
-                                        Icons.Default.Close,
-                                        contentDescription = "Remove tag",
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                // Content field
-                BasicTextField(
-                    value = currentNote.content,
-                    onValueChange = viewModel::updateContent,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .verticalScroll(rememberScrollState()),
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        fontFamily = FontFamily.Monospace,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    decorationBox = { innerTextField ->
-                        if (currentNote.content.isEmpty()) {
-                            Text(
-                                text = "Start writing in Markdown...\n\n# Heading\n**bold** *italic*\n- list item\n- another item",
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    lineHeight = 24.sp,
-                                    fontFamily = FontFamily.Monospace,
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        decorationBox = { innerTextField ->
+                            if (currentNote.title.isEmpty()) {
+                                Text(
+                                    text = "Note title",
+                                    style = TextStyle(fontSize = 24.sp),
                                     color = MaterialTheme.colorScheme.outline
                                 )
-                            )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
+                    )
+
+                    // Tags row
+                    if (currentNote.tags.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            currentNote.tags.forEach { tag ->
+                                InputChip(
+                                    selected = false,
+                                    onClick = { },
+                                    label = { Text(tag) },
+                                    trailingIcon = {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = "Remove tag",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
-                )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    // Content field
+                    BasicTextField(
+                        value = currentNote.content,
+                        onValueChange = viewModel::updateContent,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .verticalScroll(rememberScrollState()),
+                        textStyle = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        decorationBox = { innerTextField ->
+                            if (currentNote.content.isEmpty()) {
+                                Text(
+                                    text = "Start writing in Markdown...\n\n# Heading\n**bold** *italic*\n- list item\n- another item",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        lineHeight = 24.sp,
+                                        fontFamily = FontFamily.Monospace,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                }
             }
         }
     }
