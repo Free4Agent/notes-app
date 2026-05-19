@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  <meta name="description" content="Minimalist, open-source note-taking app">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- App shell rendered here -->
+    <aside id="sidebar" class="sidebar">
+      <header class="sidebar-header">
+        <h1>Notes</h1>
+        <button id="new-note-btn" class="btn btn-primary" title="New note (Ctrl+N)">+</button>
+      </header>
+      <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search notes... (Ctrl+K)">
+      </div>
+      <nav id="note-list" class="note-list">
+        <!-- Note list populated by JS -->
+        <div class="empty-state">No notes yet. Create your first note!</div>
+      </nav>
+    </aside>
+    
+    <main id="main-content" class="main-content">
+      <div id="editor-container" class="editor-container">
+        <div class="editor-toolbar">
+          <input type="text" id="note-title" placeholder="Untitled Note">
+          <div class="toolbar-actions">
+            <button id="toggle-preview" class="btn btn-ghost" title="Toggle preview">👁</button>
+            <button id="delete-note" class="btn btn-ghost btn-danger" title="Delete note">🗑</button>
+          </div>
+        </div>
+        <div class="editor-panes">
+          <textarea id="note-editor" class="note-editor" placeholder="Start writing in Markdown..."></textarea>
+          <div id="note-preview" class="note-preview markdown-body" hidden></div>
+        </div>
+      </div>
+      
+      <div id="welcome-screen" class="welcome-screen">
+        <h2>Welcome to Notes App</h2>
+        <p>A minimalist, open-source note-taking app.</p>
+        <div class="shortcuts">
+          <h3>Keyboard Shortcuts</h3>
+          <ul>
+            <li><kbd>Ctrl+N</kbd> — New note</li>
+            <li><kbd>Ctrl+K</kbd> — Search</li>
+            <li><kbd>Ctrl+P</kbd> — Toggle preview</li>
+            <li><kbd>Ctrl+S</kbd> — Save (auto-saves)</li>
+          </ul>
+        </div>
+        <button id="welcome-new-note" class="btn btn-primary">Create your first note</button>
+      </div>
+    </main>
+  </div>
+  
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
