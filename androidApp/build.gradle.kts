@@ -70,15 +70,18 @@ dependencies {
     // Koin for Android
     implementation("io.insert-koin:koin-android:3.5.3")
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+    implementation("io.insert-koin:koin-androidx-viewmodel:3.5.3")
+    
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     
     // Biometric
     implementation("androidx.biometric:biometric:1.1.0")
     
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
