@@ -45,15 +45,17 @@ jobs:
       if: steps.check_android.outputs.exists == 'true'
       run: |
         ./gradlew :androidApp:assembleDebug 2>&1 | tee build-debug.log
-        echo "Debug build completed, listing outputs:"
-        ls -la androidApp/build/outputs/apk/debug/ || echo "Debug output dir not found"
+        echo "=== Debug build outputs ==="
+        find androidApp/build -name "*.apk" -type f 2>/dev/null || echo "No APKs in androidApp/build"
+        ls -laR androidApp/build/outputs/ 2>/dev/null || echo "outputs dir not found"
       
     - name: Build Release APK
       if: steps.check_android.outputs.exists == 'true'
       run: |
         ./gradlew :androidApp:assembleRelease 2>&1 | tee build-release.log
-        echo "Release build completed, listing outputs:"
-        ls -la androidApp/build/outputs/apk/release/ || echo "Release output dir not found"
+        echo "=== Release build outputs ==="
+        find androidApp/build -name "*.apk" -type f 2>/dev/null || echo "No APKs in androidApp/build"
+        ls -laR androidApp/build/outputs/ 2>/dev/null || echo "outputs dir not found"
         
     - name: Upload Build Logs on Failure
       if: failure()
