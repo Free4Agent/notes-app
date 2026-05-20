@@ -19,6 +19,34 @@ No cloud lock-in. No subscription. No tracking. Just Markdown files on your devi
 | **Plain Markdown** | Files you can read with any text editor, forever. |
 | **Fast & Native** | 60fps, native UI, instant startup. |
 | **Privacy by default** | No accounts, no analytics, no phoning home. |
+| **AI-Agent compatible** | Built-in MCP server & CLI for AI assistants. |
+
+## 🤖 AI Agent Support
+
+This app is designed to work seamlessly with AI agents like **Hermes Agent**, **OpenClaw**, **Claude Code**, **Codex CLI**, and any MCP-compatible agent.
+
+### Quick Start for AI Agents
+
+```bash
+# Use the CLI from anywhere
+python mcp/cli.py list-notes
+python mcp/cli.py create-note --title "Idea from AI" --content "..."
+python mcp/cli.py search "meeting notes"
+
+# Or use the MCP Server for deeper integration
+# See AGENTS.md for full documentation
+```
+
+### What AI Agents Can Do
+
+- 📝 **Create notes** from conversations, meetings, ideas
+- ✅ **Manage todos** - add, complete, organize tasks
+- 🔍 **Search** your knowledge base instantly
+- 🏷️ **Auto-tag** notes based on content
+- 📊 **Generate summaries** and reports
+- 🔄 **Sync** with your WebDAV server
+
+**Full guide:** [AGENTS.md](AGENTS.md)
 
 ## Tech Stack
 
@@ -106,34 +134,21 @@ Sync Flow:
 notes-app/
 ├── shared/                     # Kotlin Multiplatform module
 │   ├── src/commonMain/kotlin/
-│   │   ├── data/
-│   │   │   ├── local/         # SQLDelight database
-│   │   │   ├── remote/        # WebDAV client
-│   │   │   └── repository/    # Repository pattern
-│   │   ├── domain/
-│   │   │   ├── model/         # Note, Todo, Tag, etc.
-│   │   │   └── usecase/       # Business logic
-│   │   └── sync/
-│   │       ├── SyncEngine.kt
-│   │       └── ConflictResolver.kt
+│   │   ├── data/         # SQLDelight database, WebDAV client
+│   │   ├── domain/       # Models and use cases
+│   │   └── sync/         # Sync engine
 │   └── src/androidMain/
 │   └── src/iosMain/           # (future)
 │
-├── androidApp/                # Android-specific code
-│   ├── src/main/
-│   │   ├── java/com/notes/app/
-│   │   │   ├── ui/           # Compose screens
-│   │   │   ├── di/           # Dependency injection (Koin)
-│   │   │   └── MainActivity.kt
-│   │   └── res/              # Resources
-│   └── build.gradle.kts
+├── androidApp/                # Android-specific code (Compose UI)
+├── mcp/                       # 🤖 AI Agent Integration
+│   ├── server.py               # MCP Server (Model Context Protocol)
+│   ├── cli.py                  # Command-line interface for agents
+│   └── requirements.txt
 │
-├── docs/
-│   ├── ADR/                  # Architecture Decision Records
-│   ├── WEBDAV_SETUP.md       # Server setup guides
-│   └── API.md
-│
-├── build.gradle.kts          # Root build script
+├── docs/                      # Documentation
+├── AGENTS.md                  # 🤖 Guide for AI agents
+├── build.gradle.kts
 └── settings.gradle.kts
 ```
 
