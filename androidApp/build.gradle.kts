@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    id("com.android.application") version "8.2.0"
+    kotlin("android") version "1.9.22"
 }
 
 android {
@@ -43,8 +43,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":shared"))
-
     val composeBom = platform("androidx.compose:compose-bom:2024.02.00")
     implementation(composeBom)
 
