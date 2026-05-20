@@ -71,28 +71,38 @@ jobs:
       id: prepare
       run: |
         VERSION=${{ github.ref_name }}
-        VERSION=${VERSION#v}  # Remove 'v' prefix if present
+        VERSION=${VERSION#v}
         if [ "$VERSION" = "${{ github.ref_name }}" ]; then
           VERSION=$(date +%Y%m%d)-$(echo ${{ github.sha }} | cut -c1-7)
         fi
         
         mkdir -p apk-output
         
-        # Check if APKs were built
-        if [ -f "androidApp/build/outputs/apk/debug/androidApp-debug.apk" ]; then
-          cp androidApp/build/outputs/apk/debug/androidApp-debug.apk apk-output/notes-app-${VERSION}-debug.apk
-          echo "debug_apk=true" >> $GITHUB_OUTPUT
-        fi
+        # Debug: Show all APK files found
+        echo "Looking for APK files..."
+        find . -name "*.apk" -type f 2>/dev/null || echo "No APKs found"
         
-        if [ -f "${{ steps.sign_app.outputs.signedReleaseFile }}" ]; then
-          cp "${{ steps.sign_app.outputs.signedReleaseFile }}" apk-output/notes-app-${VERSION}.apk
-          echo "release_apk=true" >> $GITHUB_OUTPUT
-        elif [ -f "androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk" ]; then
-          cp androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk apk-output/notes-app-${VERSION}-unsigned.apk
-          echo "release_apk=true" >> $GITHUB_OUTPUT
+        # Copy any APK found
+        FOUND_APK=false
+        for apk in $(find . -name "*.apk" -type f 2>/dev/null); do
+          echo "Found: $apk"
+          if [[ "$apk" == *"debug"* ]]; then
+            cp "$apk" apk-output/notes-app-${VERSION}-debug.apk
+            echo "debug_apk=true" >> $GITHUB_OUTPUT
+            FOUND_APK=true
+          elif [[ "$apk" == *"release"* ]] || [[ "$apk" == *"signed"* ]]; then
+            cp "$apk" apk-output/notes-app-${VERSION}.apk
+            echo "release_apk=true" >> $GITHUB_OUTPUT
+            FOUND_APK=true
+          fi
+        done
+        
+        if [ "$FOUND_APK" = false ]; then
+          echo "No APK files found!"
         fi
         
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        ls -la apk-output/ || echo "apk-output directory empty"
         
     - name: Upload APKs as Artifacts
       if: steps.prepare.outputs.debug_apk == 'true' || steps.prepare.outputs.release_apk == 'true'
