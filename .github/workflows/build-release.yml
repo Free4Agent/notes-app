@@ -66,7 +66,7 @@ jobs:
         VERSION=${{ github.ref_name }}
         VERSION=${VERSION#v}  # Remove 'v' prefix if present
         if [ "$VERSION" = "${{ github.ref_name }}" ]; then
-          VERSION=$(date +%Y%m%d)-${{ github.sha::7 }}
+          VERSION=$(date +%Y%m%d)-$(echo ${{ github.sha }} | cut -c1-7)
         fi
         
         mkdir -p apk-output
