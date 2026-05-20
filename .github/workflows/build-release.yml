@@ -91,7 +91,7 @@ jobs:
         
         # Debug: Show build outputs
         echo "=== Listing build outputs ==="
-        find . -path "*/build/outputs/apk/*" -name "*.apk" -type f 2>/dev/null | while read f; do
+        find androidApp/build -name "*.apk" -type f 2>/dev/null | while read f; do
           echo "Found: $f"
         done
         
@@ -116,6 +116,12 @@ jobs:
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
         echo "=== Final apk-output contents ==="
         ls -la apk-output/ || echo "apk-output directory is empty or does not exist"
+        
+        # Fail if no APKs found
+        if [ ! "$(ls -A apk-output/)" ]; then
+          echo "ERROR: No APK files found!"
+          exit 1
+        fi
         
     - name: Upload APKs as Artifacts
       if: always()
