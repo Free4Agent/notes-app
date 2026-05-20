@@ -87,31 +87,33 @@ jobs:
         
         mkdir -p apk-output
         
-        # Debug: Show all APK files found
-        echo "Looking for APK files..."
-        find . -name "*.apk" -type f 2>/dev/null || echo "No APKs found"
-        
-        # Copy any APK found
-        FOUND_APK=false
-        for apk in $(find . -name "*.apk" -type f 2>/dev/null); do
-          echo "Found: $apk"
-          if [[ "$apk" == *"debug"* ]]; then
-            cp "$apk" apk-output/notes-app-${VERSION}-debug.apk
-            echo "debug_apk=true" >> $GITHUB_OUTPUT
-            FOUND_APK=true
-          elif [[ "$apk" == *"release"* ]] || [[ "$apk" == *"signed"* ]]; then
-            cp "$apk" apk-output/notes-app-${VERSION}.apk
-            echo "release_apk=true" >> $GITHUB_OUTPUT
-            FOUND_APK=true
-          fi
+        # Debug: Show build outputs
+        echo "=== Listing build outputs ==="
+        find . -path "*/build/outputs/apk/*" -name "*.apk" -type f 2>/dev/null | while read f; do
+          echo "Found: $f"
         done
         
-        if [ "$FOUND_APK" = false ]; then
-          echo "No APK files found!"
+        # Copy APKs from standard Gradle output locations
+        if [ -f "androidApp/build/outputs/apk/debug/androidApp-debug.apk" ]; then
+          echo "Copying debug APK..."
+          cp androidApp/build/outputs/apk/debug/androidApp-debug.apk apk-output/notes-app-${VERSION}-debug.apk
+          echo "debug_apk=true" >> $GITHUB_OUTPUT
+        fi
+        
+        # Check for signed release APK first, then unsigned
+        if [ -f "${{ steps.sign_app.outputs.signedReleaseFile }}" ]; then
+          echo "Copying signed release APK..."
+          cp "${{ steps.sign_app.outputs.signedReleaseFile }}" apk-output/notes-app-${VERSION}.apk
+          echo "release_apk=true" >> $GITHUB_OUTPUT
+        elif [ -f "androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk" ]; then
+          echo "Copying unsigned release APK..."
+          cp androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk apk-output/notes-app-${VERSION}-unsigned.apk
+          echo "release_apk=true" >> $GITHUB_OUTPUT
         fi
         
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
-        ls -la apk-output/ || echo "apk-output directory empty"
+        echo "=== Final apk-output contents ==="
+        ls -la apk-output/ || echo "apk-output directory is empty or does not exist"
         
     - name: Upload APKs as Artifacts
       if: always()
