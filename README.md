@@ -186,6 +186,33 @@ docker run -d -p 8080:80 -v $(pwd)/test-dav:/var/lib/dav \
 # Then in app: http://localhost:8080, user: test, pass: test
 ```
 
+## 📡 Download & Installation
+
+### Obtainium (Recommended for Auto-Updates)
+
+[Obtainium](https://obtainium.imranr.dev/) allows you to install and update apps directly from GitHub releases.
+
+**Setup:**
+1. Install [Obtainium](https://github.com/ImranR98/Obtainium/releases) on your Android device
+2. Add this repository:
+   - URL: `https://github.com/Free4Agent/notes-app`
+   - Override Source: GitHub
+   - Include prereleases: Toggle on (for latest builds)
+3. Obtainium will automatically check for new releases and notify you
+
+### GitHub Releases
+
+Download APKs directly from the [Releases page](https://github.com/Free4Agent/notes-app/releases):
+
+| Release Type | APK | Description |
+|--------------|-----|-------------|
+| **Stable** | `notes-app-X.X.X.apk` | Signed release builds |
+| **Nightly** | `notes-app-YYYYMMDD-debug.apk` | Latest main branch |
+
+### F-Droid (Planned)
+
+We plan to submit to F-Droid once v1.0 is released. Track progress in [Issue #1](../../issues/1).
+
 ## Contributing
 
 1. Fork the repo
